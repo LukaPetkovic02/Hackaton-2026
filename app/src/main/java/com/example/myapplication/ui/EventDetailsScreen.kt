@@ -35,6 +35,7 @@ fun EventDetailsScreen(
     eventRatings: List<EventRating>,
     userNamesById: Map<Int, String>,
     onRateEvent: (Int, String) -> Unit,
+    onOpenParticipants: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -169,6 +170,15 @@ fun EventDetailsScreen(
                 .padding(top = 20.dp)
         ) {
             Text(if (isSaved) "Unsave Event" else "Save Event")
+        }
+
+        Button(
+            onClick = onOpenParticipants,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
+        ) {
+            Text("Participants")
         }
 
         Button(
