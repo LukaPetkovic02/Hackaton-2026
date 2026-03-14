@@ -29,5 +29,6 @@ data class EventRating(
     val userId: Int,
     val eventId: Int,
     val rating: Int,
-    val ratedAt: String
+    val ratedAt: String,
+    val comment: String
 )

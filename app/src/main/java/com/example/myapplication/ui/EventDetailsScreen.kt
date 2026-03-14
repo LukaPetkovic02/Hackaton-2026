@@ -8,13 +8,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.Event
+import com.example.myapplication.model.EventRating
 import com.example.myapplication.ui.components.StarRatingDisplay
 import com.example.myapplication.ui.components.StarRatingInput
 
@@ -25,10 +32,14 @@ fun EventDetailsScreen(
     onToggleSave: () -> Unit,
     averageRating: Double?,
     userRating: Int?,
-    onRateEvent: (Int) -> Unit,
+    eventRatings: List<EventRating>,
+    userNamesById: Map<Int, String>,
+    onRateEvent: (Int, String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var commentText by rememberSaveable { mutableStateOf("") }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -83,8 +94,20 @@ fun EventDetailsScreen(
                 text = "Rate this event",
                 modifier = Modifier.padding(top = 12.dp)
             )
+            OutlinedTextField(
+                value = commentText,
+                onValueChange = { commentText = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                label = { Text("Comment (optional)") },
+                minLines = 2
+            )
             StarRatingInput(
-                onRate = onRateEvent,
+                onRate = { rating ->
+                    onRateEvent(rating, commentText)
+                    commentText = ""
+                },
                 modifier = Modifier.padding(top = 4.dp)
             )
         } else {
@@ -100,6 +123,43 @@ fun EventDetailsScreen(
                 text = "$userRating/5",
                 modifier = Modifier.padding(top = 4.dp)
             )
+        }
+
+        Text(
+            text = "Individual ratings",
+            modifier = Modifier.padding(top = 16.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+
+        if (eventRatings.isEmpty()) {
+            Text(
+                text = "No ratings yet.",
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        } else {
+            eventRatings
+                .sortedByDescending { it.ratedAt }
+                .forEach { ratingItem ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = userNamesById[ratingItem.userId] ?: "User #${ratingItem.userId}",
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            StarRatingDisplay(rating = ratingItem.rating.toDouble())
+                            if (ratingItem.comment.isNotBlank()) {
+                                Text(
+                                    text = ratingItem.comment,
+                                    modifier = Modifier.padding(top = 6.dp)
+                                )
+                            }
+                        }
+                    }
+                }
         }
 
         Button(

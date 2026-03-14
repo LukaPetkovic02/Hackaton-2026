@@ -123,7 +123,8 @@ fun loadEventRatings(context: Context): List<EventRating> {
                     userId = fields[0].toIntOrNull() ?: return@mapNotNull null,
                     eventId = fields[1].toIntOrNull() ?: return@mapNotNull null,
                     rating = parsedRating,
-                    ratedAt = fields[3]
+                    ratedAt = fields[3],
+                    comment = if (fields.size >= 5) fields.drop(4).joinToString(",").trim() else ""
                 )
             }.toList()
         }
@@ -134,9 +135,10 @@ fun loadEventRatings(context: Context): List<EventRating> {
 
 fun saveEventRatings(context: Context, ratings: List<EventRating>) {
     val csvContent = buildString {
-        appendLine("user_id,event_id,rating,rated_at")
+        appendLine("user_id,event_id,rating,rated_at,comment")
         ratings.forEach { rating ->
-            appendLine("${rating.userId},${rating.eventId},${rating.rating},${rating.ratedAt}")
+            val safeComment = sanitizeCsvField(rating.comment)
+            appendLine("${rating.userId},${rating.eventId},${rating.rating},${rating.ratedAt},$safeComment")
         }
     }
     getEventRatingsFile(context).writeText(csvContent)
@@ -144,4 +146,8 @@ fun saveEventRatings(context: Context, ratings: List<EventRating>) {
 
 fun getEventRatingsFile(context: Context): File {
     return File(context.filesDir, "event_ratings.csv")
+}
+
+private fun sanitizeCsvField(value: String): String {
+    return value.replace(",", ";").replace("\n", " ").replace("\r", " ").trim()
 }
