@@ -171,12 +171,6 @@ fun ConsultationsScreen(
                     }
                 }
 
-                Button(
-                    onClick = { selectedExpertId = null },
-                    modifier = Modifier.padding(top = 12.dp)
-                ) {
-                    Text("Back to experts")
-                }
             }
         } else {
             if (myBookings.isEmpty()) {
