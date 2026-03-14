@@ -32,3 +32,15 @@ data class EventRating(
     val ratedAt: String,
     val comment: String
 )
+
+data class ConnectionRequest(
+    val fromUserId: Int,
+    val toUserId: Int,
+    val requestedAt: String
+)
+
+data class FriendConnection(
+    val userAId: Int,
+    val userBId: Int,
+    val connectedAt: String
+)

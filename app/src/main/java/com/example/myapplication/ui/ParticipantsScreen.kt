@@ -2,13 +2,18 @@ package com.example.myapplication.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,6 +27,10 @@ import com.example.myapplication.model.User
 fun ParticipantsScreen(
     event: Event,
     participants: List<User>,
+    currentUserId: Int,
+    friendUserIds: Set<Int>,
+    sentRequestUserIds: Set<Int>,
+    onSendConnectionRequest: (Int) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -55,15 +64,48 @@ fun ParticipantsScreen(
                         .fillMaxWidth()
                         .padding(top = 10.dp)
                 ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(
-                            text = "${user.firstName} ${user.lastName}",
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Text(
-                            text = user.email,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                text = "${user.firstName} ${user.lastName}",
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = user.email,
+                                modifier = Modifier.padding(top = 2.dp)
+                            )
+                        }
+
+                        val isSelf = user.id == currentUserId
+                        val isFriend = friendUserIds.contains(user.id)
+                        val isRequested = sentRequestUserIds.contains(user.id)
+                        val actionDisabled = isSelf || isFriend || isRequested
+
+                        Column(horizontalAlignment = Alignment.End) {
+                            IconButton(
+                                onClick = { onSendConnectionRequest(user.id) },
+                                enabled = !actionDisabled
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.PersonAdd,
+                                    contentDescription = "Send connection request"
+                                )
+                            }
+
+                            if (isSelf) {
+                                Text("You")
+                            } else if (isFriend) {
+                                Text("Friend")
+                            } else if (isRequested) {
+                                Text("Requested")
+                            }
+                        }
                     }
                 }
             }

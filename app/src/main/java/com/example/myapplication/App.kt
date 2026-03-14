@@ -20,10 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.data.loadEventRatings
 import com.example.myapplication.data.loadEventsFromCsv
+import com.example.myapplication.data.loadFriends
 import com.example.myapplication.data.loadSavedEvents
 import com.example.myapplication.data.loadUsersFromCsv
+import com.example.myapplication.data.loadConnectionRequests
 import com.example.myapplication.data.saveEventRatings
+import com.example.myapplication.data.saveConnectionRequests
 import com.example.myapplication.data.saveSavedEvents
+import com.example.myapplication.model.ConnectionRequest
 import com.example.myapplication.model.EventRating
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
@@ -42,6 +46,8 @@ fun AppContent(modifier: Modifier = Modifier) {
     val events = remember { loadEventsFromCsv(context) }
     var savedEvents by remember { mutableStateOf(loadSavedEvents(context)) }
     var eventRatings by remember { mutableStateOf(loadEventRatings(context)) }
+    var connectionRequests by remember { mutableStateOf(loadConnectionRequests(context)) }
+    val friends = remember { loadFriends(context) }
     var loggedInUser by remember { mutableStateOf<User?>(null) }
     var activeTab by remember { mutableStateOf(LoggedInTab.Home) }
     var selectedEventId by remember { mutableStateOf<Int?>(null) }
@@ -72,6 +78,14 @@ fun AppContent(modifier: Modifier = Modifier) {
         val userRatingsByEvent = eventRatings
             .filter { it.userId == currentUser.id }
             .associate { it.eventId to it.rating }
+        val friendUserIds = friends
+            .filter { it.userAId == currentUser.id || it.userBId == currentUser.id }
+            .map { if (it.userAId == currentUser.id) it.userBId else it.userAId }
+            .toSet()
+        val sentRequestUserIds = connectionRequests
+            .filter { it.fromUserId == currentUser.id }
+            .map { it.toUserId }
+            .toSet()
 
         val onToggleSave: (Int) -> Unit = { eventId ->
             val alreadySaved = savedEvents.any {
@@ -106,6 +120,21 @@ fun AppContent(modifier: Modifier = Modifier) {
                 )
                 eventRatings = updatedRatings
                 saveEventRatings(context, updatedRatings)
+            }
+        }
+
+        val onSendConnectionRequest: (Int) -> Unit = { targetUserId ->
+            val isSelf = targetUserId == currentUser.id
+            val isFriend = friendUserIds.contains(targetUserId)
+            val alreadyRequested = sentRequestUserIds.contains(targetUserId)
+            if (!isSelf && !isFriend && !alreadyRequested) {
+                val updatedRequests = connectionRequests + ConnectionRequest(
+                    fromUserId = currentUser.id,
+                    toUserId = targetUserId,
+                    requestedAt = currentTimestamp()
+                )
+                connectionRequests = updatedRequests
+                saveConnectionRequests(context, updatedRequests)
             }
         }
 
@@ -159,6 +188,10 @@ fun AppContent(modifier: Modifier = Modifier) {
                             ParticipantsScreen(
                                 event = selectedEvent,
                                 participants = participants,
+                                currentUserId = currentUser.id,
+                                friendUserIds = friendUserIds,
+                                sentRequestUserIds = sentRequestUserIds,
+                                onSendConnectionRequest = onSendConnectionRequest,
                                 onBack = { eventSubPage = EventSubPage.Details },
                                 modifier = Modifier.padding(innerPadding)
                             )
@@ -204,6 +237,10 @@ fun AppContent(modifier: Modifier = Modifier) {
                             ParticipantsScreen(
                                 event = selectedAgendaEvent,
                                 participants = participants,
+                                currentUserId = currentUser.id,
+                                friendUserIds = friendUserIds,
+                                sentRequestUserIds = sentRequestUserIds,
+                                onSendConnectionRequest = onSendConnectionRequest,
                                 onBack = { eventSubPage = EventSubPage.Details },
                                 modifier = Modifier.padding(innerPadding)
                             )

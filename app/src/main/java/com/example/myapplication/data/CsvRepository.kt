@@ -3,8 +3,10 @@ package com.example.myapplication.data
 import android.content.Context
 import com.example.myapplication.model.Event
 import com.example.myapplication.model.EventRating
+import com.example.myapplication.model.FriendConnection
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
+import com.example.myapplication.model.ConnectionRequest
 import java.io.File
 
 fun loadUsersFromCsv(context: Context): List<User> {
@@ -150,4 +152,70 @@ fun getEventRatingsFile(context: Context): File {
 
 private fun sanitizeCsvField(value: String): String {
     return value.replace(",", ";").replace("\n", " ").replace("\r", " ").trim()
+}
+
+fun loadConnectionRequests(context: Context): List<ConnectionRequest> {
+    val file = getConnectionRequestsFile(context)
+    return try {
+        if (!file.exists()) {
+            val initialContent = context.assets.open("connection_requests.csv").bufferedReader().use { it.readText() }
+            file.writeText(initialContent)
+        }
+
+        file.bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 3) return@mapNotNull null
+                ConnectionRequest(
+                    fromUserId = fields[0].toIntOrNull() ?: return@mapNotNull null,
+                    toUserId = fields[1].toIntOrNull() ?: return@mapNotNull null,
+                    requestedAt = fields[2]
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+fun saveConnectionRequests(context: Context, requests: List<ConnectionRequest>) {
+    val csvContent = buildString {
+        appendLine("from_user_id,to_user_id,requested_at")
+        requests.forEach { request ->
+            appendLine("${request.fromUserId},${request.toUserId},${request.requestedAt}")
+        }
+    }
+    getConnectionRequestsFile(context).writeText(csvContent)
+}
+
+fun getConnectionRequestsFile(context: Context): File {
+    return File(context.filesDir, "connection_requests.csv")
+}
+
+fun loadFriends(context: Context): List<FriendConnection> {
+    val file = getFriendsFile(context)
+    return try {
+        if (!file.exists()) {
+            val initialContent = context.assets.open("friends.csv").bufferedReader().use { it.readText() }
+            file.writeText(initialContent)
+        }
+
+        file.bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 3) return@mapNotNull null
+                FriendConnection(
+                    userAId = fields[0].toIntOrNull() ?: return@mapNotNull null,
+                    userBId = fields[1].toIntOrNull() ?: return@mapNotNull null,
+                    connectedAt = fields[2]
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+fun getFriendsFile(context: Context): File {
+    return File(context.filesDir, "friends.csv")
 }
