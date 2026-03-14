@@ -2,8 +2,10 @@ package com.example.myapplication
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.EventAvailable
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
@@ -19,17 +21,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myapplication.data.loadEventRatings
 import com.example.myapplication.data.loadEventsFromCsv
+import com.example.myapplication.data.loadExpertsFromCsv
 import com.example.myapplication.data.loadFriends
 import com.example.myapplication.data.loadSavedEvents
+import com.example.myapplication.data.loadConsultationBookings
+import com.example.myapplication.data.loadConsultationSlots
 import com.example.myapplication.data.loadUsersFromCsv
 import com.example.myapplication.data.loadConnectionRequests
+import com.example.myapplication.data.saveConsultationBookings
 import com.example.myapplication.data.saveEventRatings
 import com.example.myapplication.data.saveConnectionRequests
 import com.example.myapplication.data.saveFriends
 import com.example.myapplication.data.saveSavedEvents
 import com.example.myapplication.model.ConnectionRequest
+import com.example.myapplication.model.ConsultationBooking
 import com.example.myapplication.model.EventRating
 import com.example.myapplication.model.FriendConnection
 import com.example.myapplication.model.SavedEvent
@@ -38,6 +47,7 @@ import com.example.myapplication.ui.EventDetailsScreen
 import com.example.myapplication.ui.HomeScreen
 import com.example.myapplication.ui.InfoScreen
 import com.example.myapplication.ui.LoginScreen
+import com.example.myapplication.ui.ConsultationsScreen
 import com.example.myapplication.ui.MyRequestsScreen
 import com.example.myapplication.ui.ParticipantsScreen
 import com.example.myapplication.ui.SavedEventsScreen
@@ -48,8 +58,11 @@ fun AppContent(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val users = remember { loadUsersFromCsv(context) }
     val events = remember { loadEventsFromCsv(context) }
+    val experts = remember { loadExpertsFromCsv(context) }
+    val consultationSlots = remember { loadConsultationSlots(context) }
     var savedEvents by remember { mutableStateOf(loadSavedEvents(context)) }
     var eventRatings by remember { mutableStateOf(loadEventRatings(context)) }
+    var consultationBookings by remember { mutableStateOf(loadConsultationBookings(context)) }
     var connectionRequests by remember { mutableStateOf(loadConnectionRequests(context)) }
     var friends by remember { mutableStateOf(loadFriends(context)) }
     var loggedInUser by remember { mutableStateOf<User?>(null) }
@@ -181,6 +194,22 @@ fun AppContent(modifier: Modifier = Modifier) {
             }
         }
 
+        val onBookConsultationSlot: (Int) -> Boolean = { slotId ->
+            val alreadyBooked = consultationBookings.any { it.slotId == slotId }
+            if (alreadyBooked) {
+                false
+            } else {
+                val updatedBookings = consultationBookings + ConsultationBooking(
+                    userId = currentUser.id,
+                    slotId = slotId,
+                    bookedAt = currentTimestamp()
+                )
+                consultationBookings = updatedBookings
+                saveConsultationBookings(context, updatedBookings)
+                true
+            }
+        }
+
         Scaffold(
             modifier = modifier.fillMaxSize(),
             bottomBar = {
@@ -192,8 +221,8 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
-                        icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                        label = { Text("Home") }
+                        icon = { Icon(Icons.Filled.Home, contentDescription = "Home", modifier = Modifier.size(20.dp)) },
+                        label = { Text("Home", fontSize = 10.sp) }
                     )
                     NavigationBarItem(
                         selected = activeTab == LoggedInTab.MyAgenda,
@@ -202,8 +231,8 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
-                        icon = { Icon(Icons.Filled.Event, contentDescription = "My Agenda") },
-                        label = { Text("My Agenda") }
+                        icon = { Icon(Icons.Filled.Event, contentDescription = "My Agenda", modifier = Modifier.size(20.dp)) },
+                        label = { Text("Agenda", fontSize = 10.sp) }
                     )
                     NavigationBarItem(
                         selected = activeTab == LoggedInTab.Info,
@@ -212,8 +241,8 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
-                        icon = { Icon(Icons.Filled.Info, contentDescription = "Info") },
-                        label = { Text("Info") }
+                        icon = { Icon(Icons.Filled.Info, contentDescription = "Info", modifier = Modifier.size(20.dp)) },
+                        label = { Text("Info", fontSize = 10.sp) }
                     )
                     NavigationBarItem(
                         selected = activeTab == LoggedInTab.MyRequests,
@@ -222,8 +251,18 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
-                        icon = { Icon(Icons.Filled.Person, contentDescription = "My Requests") },
-                        label = { Text("Social") }
+                        icon = { Icon(Icons.Filled.Person, contentDescription = "My Requests", modifier = Modifier.size(20.dp)) },
+                        label = { Text("Social", fontSize = 10.sp) }
+                    )
+                    NavigationBarItem(
+                        selected = activeTab == LoggedInTab.Consultations,
+                        onClick = {
+                            activeTab = LoggedInTab.Consultations
+                            selectedEventId = null
+                            eventSubPage = EventSubPage.Details
+                        },
+                        icon = { Icon(Icons.Filled.EventAvailable, contentDescription = "Consultations", modifier = Modifier.size(20.dp)) },
+                        label = { Text("Consult", fontSize = 10.sp) }
                     )
                 }
             }
@@ -341,6 +380,15 @@ fun AppContent(modifier: Modifier = Modifier) {
                     onDecline = onDeclineRequest,
                     modifier = Modifier.padding(innerPadding)
                 )
+
+                LoggedInTab.Consultations -> ConsultationsScreen(
+                    currentUserId = currentUser.id,
+                    experts = experts,
+                    slots = consultationSlots,
+                    bookings = consultationBookings,
+                    onBookSlot = onBookConsultationSlot,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
         }
     }
@@ -350,7 +398,8 @@ private enum class LoggedInTab {
     Home,
     MyAgenda,
     Info,
-    MyRequests
+    MyRequests,
+    Consultations
 }
 
 private enum class EventSubPage {

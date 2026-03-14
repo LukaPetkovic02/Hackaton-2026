@@ -8,6 +8,9 @@ import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
 import com.example.myapplication.model.ConnectionRequest
 import java.io.File
+import com.example.myapplication.model.ConsultationBooking
+import com.example.myapplication.model.ConsultationSlot
+import com.example.myapplication.model.Expert
 
 fun loadUsersFromCsv(context: Context): List<User> {
     return try {
@@ -228,4 +231,80 @@ fun saveFriends(context: Context, friends: List<FriendConnection>) {
         }
     }
     getFriendsFile(context).writeText(csvContent)
+}
+
+fun loadExpertsFromCsv(context: Context): List<Expert> {
+    return try {
+        context.assets.open("experts.csv").bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 4) return@mapNotNull null
+                Expert(
+                    id = fields[0].toIntOrNull() ?: return@mapNotNull null,
+                    name = fields[1],
+                    title = fields[2],
+                    expertise = fields.drop(3).joinToString(",").trim()
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+fun loadConsultationSlots(context: Context): List<ConsultationSlot> {
+    return try {
+        context.assets.open("consultation_slots.csv").bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 4) return@mapNotNull null
+                ConsultationSlot(
+                    id = fields[0].toIntOrNull() ?: return@mapNotNull null,
+                    expertId = fields[1].toIntOrNull() ?: return@mapNotNull null,
+                    startTime = fields[2],
+                    endTime = fields[3]
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+fun loadConsultationBookings(context: Context): List<ConsultationBooking> {
+    val file = getConsultationBookingsFile(context)
+    return try {
+        if (!file.exists()) {
+            val initialContent = context.assets.open("consultation_bookings.csv").bufferedReader().use { it.readText() }
+            file.writeText(initialContent)
+        }
+
+        file.bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 3) return@mapNotNull null
+                ConsultationBooking(
+                    userId = fields[0].toIntOrNull() ?: return@mapNotNull null,
+                    slotId = fields[1].toIntOrNull() ?: return@mapNotNull null,
+                    bookedAt = fields[2]
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+fun saveConsultationBookings(context: Context, bookings: List<ConsultationBooking>) {
+    val csvContent = buildString {
+        appendLine("user_id,slot_id,booked_at")
+        bookings.forEach { booking ->
+            appendLine("${booking.userId},${booking.slotId},${booking.bookedAt}")
+        }
+    }
+    getConsultationBookingsFile(context).writeText(csvContent)
+}
+
+fun getConsultationBookingsFile(context: Context): File {
+    return File(context.filesDir, "consultation_bookings.csv")
 }

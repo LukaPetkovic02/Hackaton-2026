@@ -44,3 +44,23 @@ data class FriendConnection(
     val userBId: Int,
     val connectedAt: String
 )
+
+data class Expert(
+    val id: Int,
+    val name: String,
+    val title: String,
+    val expertise: String
+)
+
+data class ConsultationSlot(
+    val id: Int,
+    val expertId: Int,
+    val startTime: String,
+    val endTime: String
+)
+
+data class ConsultationBooking(
+    val userId: Int,
+    val slotId: Int,
+    val bookedAt: String
+)
