@@ -12,12 +12,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.Event
@@ -62,7 +64,10 @@ fun ParticipantsScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 10.dp)
+                        .padding(top = 10.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xCC0F3E67)
+                    )
                 ) {
                     Row(
                         modifier = Modifier
@@ -74,11 +79,13 @@ fun ParticipantsScreen(
                         Column {
                             Text(
                                 text = "${user.firstName} ${user.lastName}",
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFFF0F9FF)
                             )
                             Text(
                                 text = user.email,
-                                modifier = Modifier.padding(top = 2.dp)
+                                modifier = Modifier.padding(top = 2.dp),
+                                color = Color(0xFFD4EBFF)
                             )
                         }
 
@@ -94,16 +101,17 @@ fun ParticipantsScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.PersonAdd,
-                                    contentDescription = "Send connection request"
+                                    contentDescription = "Send connection request",
+                                    tint = Color(0xFFEAF6FF)
                                 )
                             }
 
                             if (isSelf) {
-                                Text("You")
+                                Text("You", color = Color(0xFFC5E6FF))
                             } else if (isFriend) {
-                                Text("Friend")
+                                Text("Friend", color = Color(0xFFC5E6FF))
                             } else if (isRequested) {
-                                Text("Requested")
+                                Text("Requested", color = Color(0xFFC5E6FF))
                             }
                         }
                     }

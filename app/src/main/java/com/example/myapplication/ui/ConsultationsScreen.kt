@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.ConsultationBooking
@@ -88,11 +90,22 @@ fun ConsultationsScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 10.dp)
+                            .padding(top = 10.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xCC0F3E67)
+                        )
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text(text = expert.name, fontWeight = FontWeight.SemiBold)
-                            Text(text = expert.title, modifier = Modifier.padding(top = 2.dp))
+                            Text(
+                                text = expert.name,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFFF0F9FF)
+                            )
+                            Text(
+                                text = expert.title,
+                                modifier = Modifier.padding(top = 2.dp),
+                                color = Color(0xFFD4EBFF)
+                            )
                             Button(
                                 onClick = { selectedExpertId = expert.id },
                                 modifier = Modifier.padding(top = 10.dp)
@@ -160,20 +173,26 @@ fun ConsultationsScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 10.dp)
+                            .padding(top = 10.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xCC0F3E67)
+                        )
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
                             Text(
                                 text = expert?.name ?: "Unknown expert",
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFFF0F9FF)
                             )
                             Text(
                                 text = "${slot.startTime} - ${slot.endTime}",
-                                modifier = Modifier.padding(top = 2.dp)
+                                modifier = Modifier.padding(top = 2.dp),
+                                color = Color(0xFFD4EBFF)
                             )
                             Text(
                                 text = "Consultation booked",
-                                modifier = Modifier.padding(top = 2.dp)
+                                modifier = Modifier.padding(top = 2.dp),
+                                color = Color(0xFFC5E6FF)
                             )
                         }
                     }

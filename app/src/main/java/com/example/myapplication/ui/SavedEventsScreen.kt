@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.Event
@@ -35,17 +36,20 @@ fun SavedEventsScreen(
         Text(
             text = "Saved Events",
             modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFEAF6FF)
         )
         Text(
             text = "Hi ${user.firstName}, here are your saved events.",
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = Color(0xFFD8EEFF)
         )
 
         if (savedEvents.isEmpty()) {
             Text(
                 text = "You have no saved events yet.",
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
+                color = Color(0xFFD8EEFF)
             )
         } else {
             savedEvents.forEach { event ->
@@ -60,7 +64,8 @@ fun SavedEventsScreen(
 
         Text(
             text = "Use Home tab to explore more events.",
-            modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
+            modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
+            color = Color(0xFFD8EEFF)
         )
     }
 }
