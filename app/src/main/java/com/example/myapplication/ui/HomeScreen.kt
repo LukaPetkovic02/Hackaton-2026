@@ -23,6 +23,7 @@ fun HomeScreen(
     user: User,
     events: List<Event>,
     savedEventIds: Set<Int>,
+    averageRatings: Map<Int, Double>,
     onOpenEventInfo: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -53,6 +54,7 @@ fun HomeScreen(
         events.forEach { event ->
             EventCard(
                 event = event,
+                averageRating = averageRatings[event.id],
                 onOpenInfo = { onOpenEventInfo(event.id) },
                 modifier = Modifier.padding(top = 12.dp)
             )

@@ -24,3 +24,10 @@ data class SavedEvent(
     val eventId: Int,
     val savedAt: String
 )
+
+data class EventRating(
+    val userId: Int,
+    val eventId: Int,
+    val rating: Int,
+    val ratedAt: String
+)

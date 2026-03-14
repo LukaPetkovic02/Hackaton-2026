@@ -19,9 +19,12 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.myapplication.data.loadEventsFromCsv
+import com.example.myapplication.data.loadEventRatings
 import com.example.myapplication.data.loadSavedEvents
 import com.example.myapplication.data.loadUsersFromCsv
+import com.example.myapplication.data.saveEventRatings
 import com.example.myapplication.data.saveSavedEvents
+import com.example.myapplication.model.EventRating
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
 import com.example.myapplication.ui.EventDetailsScreen
@@ -37,6 +40,7 @@ fun AppContent(modifier: Modifier = Modifier) {
     val users = remember { loadUsersFromCsv(context) }
     val events = remember { loadEventsFromCsv(context) }
     var savedEvents by remember { mutableStateOf(loadSavedEvents(context)) }
+    var eventRatings by remember { mutableStateOf(loadEventRatings(context)) }
     var loggedInUser by remember { mutableStateOf<User?>(null) }
     var activeTab by remember { mutableStateOf(LoggedInTab.Home) }
     var selectedEventId by remember { mutableStateOf<Int?>(null) }
@@ -58,6 +62,12 @@ fun AppContent(modifier: Modifier = Modifier) {
             .map { it.eventId }
             .toSet()
         val savedUserEvents = events.filter { savedEventIds.contains(it.id) }
+        val eventAverageRatings = eventRatings
+            .groupBy { it.eventId }
+            .mapValues { (_, ratings) -> ratings.map { it.rating }.average() }
+        val userRatingsByEvent = eventRatings
+            .filter { it.userId == currentUser.id }
+            .associate { it.eventId to it.rating }
 
         val onToggleSave: (Int) -> Unit = { eventId ->
             val alreadySaved = savedEvents.any {
@@ -76,6 +86,22 @@ fun AppContent(modifier: Modifier = Modifier) {
             }
             savedEvents = updated
             saveSavedEvents(context, updated)
+        }
+
+        val onRateEvent: (Int, Int) -> Unit = { eventId, rating ->
+            val alreadyRated = eventRatings.any {
+                it.userId == currentUser.id && it.eventId == eventId
+            }
+            if (!alreadyRated && rating in 1..5) {
+                val updatedRatings = eventRatings + EventRating(
+                    userId = currentUser.id,
+                    eventId = eventId,
+                    rating = rating,
+                    ratedAt = currentTimestamp()
+                )
+                eventRatings = updatedRatings
+                saveEventRatings(context, updatedRatings)
+            }
         }
 
         Scaffold(
@@ -120,6 +146,9 @@ fun AppContent(modifier: Modifier = Modifier) {
                             event = selectedEvent,
                             isSaved = savedEventIds.contains(selectedEvent.id),
                             onToggleSave = { onToggleSave(selectedEvent.id) },
+                            averageRating = eventAverageRatings[selectedEvent.id],
+                            userRating = userRatingsByEvent[selectedEvent.id],
+                            onRateEvent = { rating -> onRateEvent(selectedEvent.id, rating) },
                             onBack = { selectedEventId = null },
                             modifier = Modifier.padding(innerPadding)
                         )
@@ -128,6 +157,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             user = currentUser,
                             events = events,
                             savedEventIds = savedEventIds,
+                            averageRatings = eventAverageRatings,
                             onOpenEventInfo = { eventId -> selectedEventId = eventId },
                             modifier = Modifier.padding(innerPadding)
                         )
@@ -141,6 +171,9 @@ fun AppContent(modifier: Modifier = Modifier) {
                             event = selectedAgendaEvent,
                             isSaved = savedEventIds.contains(selectedAgendaEvent.id),
                             onToggleSave = { onToggleSave(selectedAgendaEvent.id) },
+                            averageRating = eventAverageRatings[selectedAgendaEvent.id],
+                            userRating = userRatingsByEvent[selectedAgendaEvent.id],
+                            onRateEvent = { rating -> onRateEvent(selectedAgendaEvent.id, rating) },
                             onBack = { selectedEventId = null },
                             modifier = Modifier.padding(innerPadding)
                         )
@@ -148,6 +181,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                         SavedEventsScreen(
                             user = currentUser,
                             savedEvents = savedUserEvents,
+                            averageRatings = eventAverageRatings,
                             onOpenEventInfo = { eventId -> selectedEventId = eventId },
                             modifier = Modifier.padding(innerPadding)
                         )

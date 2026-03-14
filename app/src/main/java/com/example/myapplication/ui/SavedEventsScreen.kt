@@ -20,6 +20,7 @@ import com.example.myapplication.ui.components.EventCard
 fun SavedEventsScreen(
     user: User,
     savedEvents: List<Event>,
+    averageRatings: Map<Int, Double>,
     onOpenEventInfo: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -50,6 +51,7 @@ fun SavedEventsScreen(
             savedEvents.forEach { event ->
                 EventCard(
                     event = event,
+                    averageRating = averageRatings[event.id],
                     onOpenInfo = { onOpenEventInfo(event.id) },
                     modifier = Modifier.padding(top = 12.dp)
                 )

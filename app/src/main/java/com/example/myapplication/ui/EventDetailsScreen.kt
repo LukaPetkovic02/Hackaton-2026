@@ -2,6 +2,7 @@ package com.example.myapplication.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,9 @@ fun EventDetailsScreen(
     event: Event,
     isSaved: Boolean,
     onToggleSave: () -> Unit,
+    averageRating: Double?,
+    userRating: Int?,
+    onRateEvent: (Int) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -59,6 +63,33 @@ fun EventDetailsScreen(
             text = event.description,
             modifier = Modifier.padding(top = 12.dp)
         )
+        Text(
+            text = "Average rating: ${averageRating?.let { String.format("%.1f", it) } ?: "N/A"}",
+            modifier = Modifier.padding(top = 12.dp),
+            fontWeight = FontWeight.SemiBold
+        )
+
+        if (userRating == null) {
+            Text(
+                text = "Rate this event (1-5):",
+                modifier = Modifier.padding(top = 12.dp)
+            )
+            Row(modifier = Modifier.padding(top = 8.dp)) {
+                (1..5).forEach { ratingValue ->
+                    Button(
+                        onClick = { onRateEvent(ratingValue) },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(ratingValue.toString())
+                    }
+                }
+            }
+        } else {
+            Text(
+                text = "Your rating: $userRating/5",
+                modifier = Modifier.padding(top = 12.dp)
+            )
+        }
 
         Button(
             onClick = onToggleSave,

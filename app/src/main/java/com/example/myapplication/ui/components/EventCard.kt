@@ -22,6 +22,7 @@ import com.example.myapplication.model.Event
 @Composable
 fun EventCard(
     event: Event,
+    averageRating: Double? = null,
     isSaved: Boolean? = null,
     onToggleSave: (() -> Unit)? = null,
     onOpenInfo: (() -> Unit)? = null,
@@ -37,13 +38,17 @@ fun EventCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.fillMaxWidth(0.75f)) {
                 Text(
                     text = "${event.startTime} ${event.title}",
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = event.location,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+                Text(
+                    text = "Avg rating: ${averageRating?.let { String.format("%.1f", it) } ?: "N/A"}",
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }

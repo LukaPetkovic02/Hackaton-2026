@@ -2,6 +2,7 @@ package com.example.myapplication.data
 
 import android.content.Context
 import com.example.myapplication.model.Event
+import com.example.myapplication.model.EventRating
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
 import java.io.File
@@ -102,4 +103,45 @@ fun saveSavedEvents(context: Context, savedEvents: List<SavedEvent>) {
 
 fun getSavedEventsFile(context: Context): File {
     return File(context.filesDir, "saved_events.csv")
+}
+
+fun loadEventRatings(context: Context): List<EventRating> {
+    val file = getEventRatingsFile(context)
+    return try {
+        if (!file.exists()) {
+            val initialContent = context.assets.open("event_ratings.csv").bufferedReader().use { it.readText() }
+            file.writeText(initialContent)
+        }
+
+        file.bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 4) return@mapNotNull null
+                val parsedRating = fields[2].toIntOrNull() ?: return@mapNotNull null
+                if (parsedRating !in 1..5) return@mapNotNull null
+                EventRating(
+                    userId = fields[0].toIntOrNull() ?: return@mapNotNull null,
+                    eventId = fields[1].toIntOrNull() ?: return@mapNotNull null,
+                    rating = parsedRating,
+                    ratedAt = fields[3]
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
+    }
+}
+
+fun saveEventRatings(context: Context, ratings: List<EventRating>) {
+    val csvContent = buildString {
+        appendLine("user_id,event_id,rating,rated_at")
+        ratings.forEach { rating ->
+            appendLine("${rating.userId},${rating.eventId},${rating.rating},${rating.ratedAt}")
+        }
+    }
+    getEventRatingsFile(context).writeText(csvContent)
+}
+
+fun getEventRatingsFile(context: Context): File {
+    return File(context.filesDir, "event_ratings.csv")
 }
