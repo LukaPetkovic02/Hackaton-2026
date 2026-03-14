@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.User
@@ -33,27 +34,33 @@ fun InfoScreen(
         Text(
             text = "Community Day Info",
             modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFEAF6FF)
         )
         Text(
             text = "Hello ${user.firstName}, welcome to Community Day 2026.",
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = "Community Day brings together experts, businesses, and technology partners to discuss fiscalization, POS innovation, and practical implementation challenges.",
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = "Venue: Main Hall & Conference Rooms",
-            modifier = Modifier.padding(top = 12.dp)
+            modifier = Modifier.padding(top = 12.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = "Support desk: Open all day",
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 4.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = "Tip: Use My Agenda tab to quickly access your saved sessions.",
-            modifier = Modifier.padding(top = 12.dp)
+            modifier = Modifier.padding(top = 12.dp),
+            color = Color(0xFFD8EEFF)
         )
 
         Button(

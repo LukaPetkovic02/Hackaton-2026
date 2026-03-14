@@ -27,10 +27,23 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.ConsultationBooking
 import com.example.myapplication.model.ConsultationSlot
 import com.example.myapplication.model.Expert
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 private enum class ConsultationsMode {
     Experts,
     MyConsultations
+}
+
+private val hhmmFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+private fun formatToHourMinute(value: String): String {
+    return runCatching { LocalDateTime.parse(value).toLocalTime().format(hhmmFormatter) }
+        .getOrElse {
+            runCatching { LocalTime.parse(value).format(hhmmFormatter) }
+                .getOrElse { value }
+        }
 }
 
 @Composable
@@ -61,7 +74,8 @@ fun ConsultationsScreen(
         Text(
             text = "Consultations",
             modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFEAF6FF)
         )
 
         Row(modifier = Modifier.padding(top = 12.dp)) {
@@ -79,7 +93,8 @@ fun ConsultationsScreen(
         if (statusMessage.isNotBlank()) {
             Text(
                 text = statusMessage,
-                modifier = Modifier.padding(top = 10.dp)
+                modifier = Modifier.padding(top = 10.dp),
+                color = Color(0xFFD8EEFF)
             )
         }
 
@@ -119,16 +134,19 @@ fun ConsultationsScreen(
                 Text(
                     text = selectedExpert.name,
                     modifier = Modifier.padding(top = 16.dp),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFFEAF6FF)
                 )
                 Text(
                     text = "Expertise: ${selectedExpert.expertise}",
-                    modifier = Modifier.padding(top = 6.dp)
+                    modifier = Modifier.padding(top = 6.dp),
+                    color = Color(0xFFD8EEFF)
                 )
                 Text(
                     text = "Available slots:",
                     modifier = Modifier.padding(top = 12.dp),
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFFEAF6FF)
                 )
 
                 val expertSlots = slots
@@ -149,7 +167,7 @@ fun ConsultationsScreen(
                         enabled = !isBooked,
                         modifier = Modifier.padding(top = 8.dp)
                     ) {
-                        Text("${slot.startTime} - ${slot.endTime}")
+                        Text("${formatToHourMinute(slot.startTime)} - ${formatToHourMinute(slot.endTime)}")
                     }
                 }
 
@@ -164,7 +182,8 @@ fun ConsultationsScreen(
             if (myBookings.isEmpty()) {
                 Text(
                     text = "You have no consultations booked.",
-                    modifier = Modifier.padding(top = 16.dp, bottom = 24.dp)
+                    modifier = Modifier.padding(top = 16.dp, bottom = 24.dp),
+                    color = Color(0xFFD8EEFF)
                 )
             } else {
                 myBookings.forEach { booking ->
@@ -185,7 +204,7 @@ fun ConsultationsScreen(
                                 color = Color(0xFFF0F9FF)
                             )
                             Text(
-                                text = "${slot.startTime} - ${slot.endTime}",
+                                text = "${formatToHourMinute(slot.startTime)} - ${formatToHourMinute(slot.endTime)}",
                                 modifier = Modifier.padding(top = 2.dp),
                                 color = Color(0xFFD4EBFF)
                             )

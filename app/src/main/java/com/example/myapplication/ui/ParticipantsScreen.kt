@@ -47,17 +47,20 @@ fun ParticipantsScreen(
         Text(
             text = "Participants",
             modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFEAF6FF)
         )
         Text(
             text = event.title,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = Color(0xFFD8EEFF)
         )
 
         if (participants.isEmpty()) {
             Text(
                 text = "No participants saved this event yet.",
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
+                color = Color(0xFFD8EEFF)
             )
         } else {
             participants.forEach { user ->

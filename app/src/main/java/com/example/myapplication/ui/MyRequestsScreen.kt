@@ -44,19 +44,22 @@ fun MyRequestsScreen(
         Text(
             text = "My Requests",
             modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFEAF6FF)
         )
 
         Text(
             text = "Received",
             modifier = Modifier.padding(top = 16.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFFEAF6FF)
         )
 
         if (receivedRequests.isEmpty()) {
             Text(
                 text = "No received requests.",
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
+                color = Color(0xFFD8EEFF)
             )
         } else {
             receivedRequests.forEach { request ->
@@ -98,13 +101,15 @@ fun MyRequestsScreen(
         Text(
             text = "Sent",
             modifier = Modifier.padding(top = 20.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFFEAF6FF)
         )
 
         if (sentRequests.isEmpty()) {
             Text(
                 text = "No sent requests.",
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
+                color = Color(0xFFD8EEFF)
             )
         } else {
             sentRequests.forEach { request ->
@@ -135,13 +140,15 @@ fun MyRequestsScreen(
         Text(
             text = "Connections",
             modifier = Modifier.padding(top = 20.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFFEAF6FF)
         )
 
         if (connections.isEmpty()) {
             Text(
                 text = "No connections yet.",
-                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp)
+                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
+                color = Color(0xFFD8EEFF)
             )
         } else {
             connections.forEach { user ->

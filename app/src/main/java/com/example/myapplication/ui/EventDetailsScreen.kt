@@ -54,34 +54,41 @@ fun EventDetailsScreen(
         Text(
             text = event.title,
             modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFEAF6FF)
         )
         Text(
             text = "${event.startTime} - ${event.endTime}",
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = "Location: ${event.location}",
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = Color(0xFFD8EEFF)
         )
         if (event.speaker.isNotBlank()) {
             Text(
                 text = "Speaker: ${event.speaker}",
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
+                color = Color(0xFFD8EEFF)
             )
         }
         Text(
             text = "Category: ${event.category}",
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = event.description,
-            modifier = Modifier.padding(top = 12.dp)
+            modifier = Modifier.padding(top = 12.dp),
+            color = Color(0xFFD8EEFF)
         )
         Text(
             text = "Average rating",
             modifier = Modifier.padding(top = 12.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFFEAF6FF)
         )
         StarRatingDisplay(
             rating = averageRating,
@@ -89,13 +96,15 @@ fun EventDetailsScreen(
         )
         Text(
             text = averageRating?.let { String.format("%.1f/5", it) } ?: "N/A",
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 4.dp),
+            color = Color(0xFFD8EEFF)
         )
 
         if (userRating == null) {
             Text(
                 text = "Rate this event",
-                modifier = Modifier.padding(top = 12.dp)
+                modifier = Modifier.padding(top = 12.dp),
+                color = Color(0xFFEAF6FF)
             )
             OutlinedTextField(
                 value = commentText,
@@ -116,7 +125,8 @@ fun EventDetailsScreen(
         } else {
             Text(
                 text = "Your rating",
-                modifier = Modifier.padding(top = 12.dp)
+                modifier = Modifier.padding(top = 12.dp),
+                color = Color(0xFFEAF6FF)
             )
             StarRatingDisplay(
                 rating = userRating.toDouble(),
@@ -124,20 +134,23 @@ fun EventDetailsScreen(
             )
             Text(
                 text = "$userRating/5",
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 4.dp),
+                color = Color(0xFFD8EEFF)
             )
         }
 
         Text(
             text = "Individual ratings",
             modifier = Modifier.padding(top = 16.dp),
-            fontWeight = FontWeight.SemiBold
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFFEAF6FF)
         )
 
         if (eventRatings.isEmpty()) {
             Text(
                 text = "No ratings yet.",
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
+                color = Color(0xFFD8EEFF)
             )
         } else {
             eventRatings
