@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,8 +22,9 @@ import com.example.myapplication.model.Event
 @Composable
 fun EventCard(
     event: Event,
-    isSaved: Boolean,
-    onToggleSave: () -> Unit,
+    isSaved: Boolean? = null,
+    onToggleSave: (() -> Unit)? = null,
+    onOpenInfo: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -43,11 +48,23 @@ fun EventCard(
                 )
             }
 
-            Button(
-                onClick = onToggleSave,
-                modifier = Modifier.padding(start = 12.dp)
-            ) {
-                Text(if (isSaved) "Unsave" else "Save")
+            if (onOpenInfo != null) {
+                IconButton(
+                    onClick = onOpenInfo,
+                    modifier = Modifier.padding(start = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Event info"
+                    )
+                }
+            } else if (onToggleSave != null && isSaved != null) {
+                Button(
+                    onClick = onToggleSave,
+                    modifier = Modifier.padding(start = 12.dp)
+                ) {
+                    Text(if (isSaved) "Unsave" else "Save")
+                }
             }
         }
     }

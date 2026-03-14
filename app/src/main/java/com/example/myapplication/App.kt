@@ -23,6 +23,7 @@ import com.example.myapplication.data.loadUsersFromCsv
 import com.example.myapplication.data.saveSavedEvents
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
+import com.example.myapplication.ui.EventDetailsScreen
 import com.example.myapplication.ui.HomeScreen
 import com.example.myapplication.ui.InfoScreen
 import com.example.myapplication.ui.LoginScreen
@@ -37,6 +38,7 @@ fun AppContent(modifier: Modifier = Modifier) {
     var savedEvents by remember { mutableStateOf(loadSavedEvents(context)) }
     var loggedInUser by remember { mutableStateOf<User?>(null) }
     var activeTab by remember { mutableStateOf(LoggedInTab.Home) }
+    var selectedEventId by remember { mutableStateOf<Int?>(null) }
 
     if (loggedInUser == null) {
         LoginScreen(
@@ -44,6 +46,7 @@ fun AppContent(modifier: Modifier = Modifier) {
             onLoginSuccess = { matchedUser ->
                 loggedInUser = matchedUser
                 activeTab = LoggedInTab.Home
+                selectedEventId = null
             },
             modifier = modifier
         )
@@ -78,21 +81,46 @@ fun AppContent(modifier: Modifier = Modifier) {
             modifier = modifier.fillMaxSize()
         ) {
             when (activeTab) {
-                LoggedInTab.Home -> HomeScreen(
-                    user = currentUser,
-                    events = events,
-                    savedEventIds = savedEventIds,
-                    onToggleSave = onToggleSave,
-                    modifier = Modifier.weight(1f)
-                )
+                LoggedInTab.Home -> {
+                    val selectedEvent = events.find { it.id == selectedEventId }
+                    if (selectedEvent != null) {
+                        EventDetailsScreen(
+                            event = selectedEvent,
+                            isSaved = savedEventIds.contains(selectedEvent.id),
+                            onToggleSave = { onToggleSave(selectedEvent.id) },
+                            onBack = { selectedEventId = null },
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        HomeScreen(
+                            user = currentUser,
+                            events = events,
+                            savedEventIds = savedEventIds,
+                            onOpenEventInfo = { eventId -> selectedEventId = eventId },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
 
-                LoggedInTab.MyAgenda -> SavedEventsScreen(
-                    user = currentUser,
-                    savedEvents = savedUserEvents,
-                    savedEventIds = savedEventIds,
-                    onToggleSave = onToggleSave,
-                    modifier = Modifier.weight(1f)
-                )
+                LoggedInTab.MyAgenda -> {
+                    val selectedAgendaEvent = savedUserEvents.find { it.id == selectedEventId }
+                    if (selectedAgendaEvent != null) {
+                        EventDetailsScreen(
+                            event = selectedAgendaEvent,
+                            isSaved = savedEventIds.contains(selectedAgendaEvent.id),
+                            onToggleSave = { onToggleSave(selectedAgendaEvent.id) },
+                            onBack = { selectedEventId = null },
+                            modifier = Modifier.weight(1f)
+                        )
+                    } else {
+                        SavedEventsScreen(
+                            user = currentUser,
+                            savedEvents = savedUserEvents,
+                            onOpenEventInfo = { eventId -> selectedEventId = eventId },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
 
                 LoggedInTab.Info -> InfoScreen(
                     user = currentUser,
@@ -104,19 +132,28 @@ fun AppContent(modifier: Modifier = Modifier) {
             NavigationBar {
                 NavigationBarItem(
                     selected = activeTab == LoggedInTab.Home,
-                    onClick = { activeTab = LoggedInTab.Home },
+                    onClick = {
+                        activeTab = LoggedInTab.Home
+                        selectedEventId = null
+                    },
                     icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = activeTab == LoggedInTab.MyAgenda,
-                    onClick = { activeTab = LoggedInTab.MyAgenda },
+                    onClick = {
+                        activeTab = LoggedInTab.MyAgenda
+                        selectedEventId = null
+                    },
                     icon = { Icon(Icons.Filled.Event, contentDescription = "My Agenda") },
                     label = { Text("My Agenda") }
                 )
                 NavigationBarItem(
                     selected = activeTab == LoggedInTab.Info,
-                    onClick = { activeTab = LoggedInTab.Info },
+                    onClick = {
+                        activeTab = LoggedInTab.Info
+                        selectedEventId = null
+                    },
                     icon = { Icon(Icons.Filled.Info, contentDescription = "Info") },
                     label = { Text("Info") }
                 )

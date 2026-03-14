@@ -20,8 +20,7 @@ import com.example.myapplication.ui.components.EventCard
 fun SavedEventsScreen(
     user: User,
     savedEvents: List<Event>,
-    savedEventIds: Set<Int>,
-    onToggleSave: (Int) -> Unit,
+    onOpenEventInfo: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -51,8 +50,7 @@ fun SavedEventsScreen(
             savedEvents.forEach { event ->
                 EventCard(
                     event = event,
-                    isSaved = savedEventIds.contains(event.id),
-                    onToggleSave = { onToggleSave(event.id) },
+                    onOpenInfo = { onOpenEventInfo(event.id) },
                     modifier = Modifier.padding(top = 12.dp)
                 )
             }
