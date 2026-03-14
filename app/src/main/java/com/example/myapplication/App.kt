@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Home
@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -77,9 +78,40 @@ fun AppContent(modifier: Modifier = Modifier) {
             saveSavedEvents(context, updated)
         }
 
-        Column(
-            modifier = modifier.fillMaxSize()
-        ) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
+            bottomBar = {
+                NavigationBar {
+                    NavigationBarItem(
+                        selected = activeTab == LoggedInTab.Home,
+                        onClick = {
+                            activeTab = LoggedInTab.Home
+                            selectedEventId = null
+                        },
+                        icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+                        label = { Text("Home") }
+                    )
+                    NavigationBarItem(
+                        selected = activeTab == LoggedInTab.MyAgenda,
+                        onClick = {
+                            activeTab = LoggedInTab.MyAgenda
+                            selectedEventId = null
+                        },
+                        icon = { Icon(Icons.Filled.Event, contentDescription = "My Agenda") },
+                        label = { Text("My Agenda") }
+                    )
+                    NavigationBarItem(
+                        selected = activeTab == LoggedInTab.Info,
+                        onClick = {
+                            activeTab = LoggedInTab.Info
+                            selectedEventId = null
+                        },
+                        icon = { Icon(Icons.Filled.Info, contentDescription = "Info") },
+                        label = { Text("Info") }
+                    )
+                }
+            }
+        ) { innerPadding ->
             when (activeTab) {
                 LoggedInTab.Home -> {
                     val selectedEvent = events.find { it.id == selectedEventId }
@@ -89,7 +121,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             isSaved = savedEventIds.contains(selectedEvent.id),
                             onToggleSave = { onToggleSave(selectedEvent.id) },
                             onBack = { selectedEventId = null },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.padding(innerPadding)
                         )
                     } else {
                         HomeScreen(
@@ -97,7 +129,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             events = events,
                             savedEventIds = savedEventIds,
                             onOpenEventInfo = { eventId -> selectedEventId = eventId },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.padding(innerPadding)
                         )
                     }
                 }
@@ -110,14 +142,14 @@ fun AppContent(modifier: Modifier = Modifier) {
                             isSaved = savedEventIds.contains(selectedAgendaEvent.id),
                             onToggleSave = { onToggleSave(selectedAgendaEvent.id) },
                             onBack = { selectedEventId = null },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.padding(innerPadding)
                         )
                     } else {
                         SavedEventsScreen(
                             user = currentUser,
                             savedEvents = savedUserEvents,
                             onOpenEventInfo = { eventId -> selectedEventId = eventId },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.padding(innerPadding)
                         )
                     }
                 }
@@ -125,37 +157,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                 LoggedInTab.Info -> InfoScreen(
                     user = currentUser,
                     onLogout = { loggedInUser = null },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            NavigationBar {
-                NavigationBarItem(
-                    selected = activeTab == LoggedInTab.Home,
-                    onClick = {
-                        activeTab = LoggedInTab.Home
-                        selectedEventId = null
-                    },
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
-                    label = { Text("Home") }
-                )
-                NavigationBarItem(
-                    selected = activeTab == LoggedInTab.MyAgenda,
-                    onClick = {
-                        activeTab = LoggedInTab.MyAgenda
-                        selectedEventId = null
-                    },
-                    icon = { Icon(Icons.Filled.Event, contentDescription = "My Agenda") },
-                    label = { Text("My Agenda") }
-                )
-                NavigationBarItem(
-                    selected = activeTab == LoggedInTab.Info,
-                    onClick = {
-                        activeTab = LoggedInTab.Info
-                        selectedEventId = null
-                    },
-                    icon = { Icon(Icons.Filled.Info, contentDescription = "Info") },
-                    label = { Text("Info") }
+                    modifier = Modifier.padding(innerPadding)
                 )
             }
         }
