@@ -27,6 +27,7 @@ fun HomeScreen(
     events: List<Event>,
     savedEventIds: Set<Int>,
     onToggleSave: (Int) -> Unit,
+    onOpenSavedEvents: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -78,10 +79,18 @@ fun HomeScreen(
             modifier = Modifier.padding(top = 4.dp)
         )
         Button(
+            onClick = onOpenSavedEvents,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Text("View Saved Events")
+        }
+        Button(
             onClick = onLogout,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 24.dp)
+                .padding(top = 12.dp, bottom = 24.dp)
         ) {
             Text("Logout")
         }
