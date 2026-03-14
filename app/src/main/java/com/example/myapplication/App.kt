@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -65,16 +66,18 @@ fun AppContent(modifier: Modifier = Modifier) {
     var consultationBookings by remember { mutableStateOf(loadConsultationBookings(context)) }
     var connectionRequests by remember { mutableStateOf(loadConnectionRequests(context)) }
     var friends by remember { mutableStateOf(loadFriends(context)) }
-    var loggedInUser by remember { mutableStateOf<User?>(null) }
+    var loggedInUserId by remember { mutableStateOf(getPersistedLoggedInUserId(context)) }
     var activeTab by remember { mutableStateOf(LoggedInTab.Home) }
     var selectedEventId by remember { mutableStateOf<Int?>(null) }
     var eventSubPage by remember { mutableStateOf(EventSubPage.Details) }
+    val loggedInUser = users.find { it.id == loggedInUserId }
 
     if (loggedInUser == null) {
         LoginScreen(
             users = users,
             onLoginSuccess = { matchedUser ->
-                loggedInUser = matchedUser
+                loggedInUserId = matchedUser.id
+                persistLoggedInUserId(context, matchedUser.id)
                 activeTab = LoggedInTab.Home
                 selectedEventId = null
                 eventSubPage = EventSubPage.Details
@@ -367,7 +370,10 @@ fun AppContent(modifier: Modifier = Modifier) {
 
                 LoggedInTab.Info -> InfoScreen(
                     user = currentUser,
-                    onLogout = { loggedInUser = null },
+                    onLogout = {
+                        loggedInUserId = null
+                        persistLoggedInUserId(context, null)
+                    },
                     modifier = Modifier.padding(innerPadding)
                 )
 
@@ -392,6 +398,19 @@ fun AppContent(modifier: Modifier = Modifier) {
             }
         }
     }
+}
+
+private fun getPersistedLoggedInUserId(context: Context): Int? {
+    val prefs = context.getSharedPreferences("app_session", Context.MODE_PRIVATE)
+    val userId = prefs.getInt("logged_in_user_id", -1)
+    return if (userId == -1) null else userId
+}
+
+private fun persistLoggedInUserId(context: Context, userId: Int?) {
+    val prefs = context.getSharedPreferences("app_session", Context.MODE_PRIVATE)
+    prefs.edit().apply {
+        if (userId == null) remove("logged_in_user_id") else putInt("logged_in_user_id", userId)
+    }.apply()
 }
 
 private enum class LoggedInTab {
