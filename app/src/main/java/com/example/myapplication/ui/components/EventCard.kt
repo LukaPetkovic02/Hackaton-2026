@@ -47,10 +47,13 @@ fun EventCard(
                     text = event.location,
                     modifier = Modifier.padding(top = 2.dp)
                 )
-                Text(
-                    text = "Avg rating: ${averageRating?.let { String.format("%.1f", it) } ?: "N/A"}",
-                    modifier = Modifier.padding(top = 2.dp)
-                )
+                Row(modifier = Modifier.padding(top = 4.dp)) {
+                    StarRatingDisplay(rating = averageRating)
+                    Text(
+                        text = " ${averageRating?.let { String.format("%.1f", it) } ?: "N/A"}",
+                        modifier = Modifier.padding(start = 6.dp)
+                    )
+                }
             }
 
             if (onOpenInfo != null) {

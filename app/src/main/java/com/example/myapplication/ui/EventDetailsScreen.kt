@@ -2,7 +2,6 @@ package com.example.myapplication.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.model.Event
+import com.example.myapplication.ui.components.StarRatingDisplay
+import com.example.myapplication.ui.components.StarRatingInput
 
 @Composable
 fun EventDetailsScreen(
@@ -64,30 +65,40 @@ fun EventDetailsScreen(
             modifier = Modifier.padding(top = 12.dp)
         )
         Text(
-            text = "Average rating: ${averageRating?.let { String.format("%.1f", it) } ?: "N/A"}",
+            text = "Average rating",
             modifier = Modifier.padding(top = 12.dp),
             fontWeight = FontWeight.SemiBold
+        )
+        StarRatingDisplay(
+            rating = averageRating,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        Text(
+            text = averageRating?.let { String.format("%.1f/5", it) } ?: "N/A",
+            modifier = Modifier.padding(top = 4.dp)
         )
 
         if (userRating == null) {
             Text(
-                text = "Rate this event (1-5):",
+                text = "Rate this event",
                 modifier = Modifier.padding(top = 12.dp)
             )
-            Row(modifier = Modifier.padding(top = 8.dp)) {
-                (1..5).forEach { ratingValue ->
-                    Button(
-                        onClick = { onRateEvent(ratingValue) },
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text(ratingValue.toString())
-                    }
-                }
-            }
+            StarRatingInput(
+                onRate = onRateEvent,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         } else {
             Text(
-                text = "Your rating: $userRating/5",
+                text = "Your rating",
                 modifier = Modifier.padding(top = 12.dp)
+            )
+            StarRatingDisplay(
+                rating = userRating.toDouble(),
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "$userRating/5",
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
 
