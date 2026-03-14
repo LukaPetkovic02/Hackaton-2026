@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +26,6 @@ fun HomeScreen(
     events: List<Event>,
     savedEventIds: Set<Int>,
     onToggleSave: (Int) -> Unit,
-    onOpenSavedEvents: () -> Unit,
-    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -78,21 +75,6 @@ fun HomeScreen(
             text = "A full day of talks, networking, and practical consultations focused on fiscalization and POS technology. You saved ${savedEventIds.size} event(s).",
             modifier = Modifier.padding(top = 4.dp)
         )
-        Button(
-            onClick = onOpenSavedEvents,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-        ) {
-            Text("View Saved Events")
-        }
-        Button(
-            onClick = onLogout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 24.dp)
-        ) {
-            Text("Logout")
-        }
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
