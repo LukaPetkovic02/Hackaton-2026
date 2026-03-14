@@ -5,11 +5,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,12 +57,26 @@ fun EventDetailsScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        Text(
-            text = event.title,
-            modifier = Modifier.padding(top = 24.dp),
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFFEAF6FF)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = event.title,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFEAF6FF)
+            )
+            IconButton(onClick = onToggleSave) {
+                Icon(
+                    imageVector = if (isSaved) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
+                    contentDescription = if (isSaved) "Unsave event" else "Save event",
+                    tint = Color(0xFFEAF6FF)
+                )
+            }
+        }
         Text(
             text = "${event.startTime} - ${event.endTime}",
             modifier = Modifier.padding(top = 8.dp),
@@ -184,19 +204,10 @@ fun EventDetailsScreen(
         }
 
         Button(
-            onClick = onToggleSave,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp)
-        ) {
-            Text(if (isSaved) "Unsave Event" else "Save Event")
-        }
-
-        Button(
             onClick = onOpenParticipants,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp)
+                .padding(top = 20.dp)
         ) {
             Text("Participants")
         }

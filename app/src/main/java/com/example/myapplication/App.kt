@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -258,6 +259,13 @@ fun AppContent(modifier: Modifier = Modifier) {
                 NavigationBar(
                     containerColor = Color(0xB20C3457)
                 ) {
+                    val bottomNavColors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFEAF6FF),
+                        unselectedIconColor = Color(0xFFBFDFFF),
+                        selectedTextColor = Color(0xFFEAF6FF),
+                        unselectedTextColor = Color(0xFFBFDFFF),
+                        indicatorColor = Color(0x553B79A8)
+                    )
                     NavigationBarItem(
                         selected = activeTab == LoggedInTab.Home,
                         onClick = {
@@ -265,6 +273,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
+                        colors = bottomNavColors,
                         icon = { Icon(Icons.Filled.Home, contentDescription = "Home", modifier = Modifier.size(20.dp)) },
                         label = { Text("Home", fontSize = 10.sp) }
                     )
@@ -275,6 +284,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
+                        colors = bottomNavColors,
                         icon = { Icon(Icons.Filled.Event, contentDescription = "My Agenda", modifier = Modifier.size(20.dp)) },
                         label = { Text("Agenda", fontSize = 10.sp) }
                     )
@@ -285,6 +295,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
+                        colors = bottomNavColors,
                         icon = { Icon(Icons.Filled.Info, contentDescription = "Info", modifier = Modifier.size(20.dp)) },
                         label = { Text("Info", fontSize = 10.sp) }
                     )
@@ -295,6 +306,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
+                        colors = bottomNavColors,
                         icon = { Icon(Icons.Filled.Person, contentDescription = "My Requests", modifier = Modifier.size(20.dp)) },
                         label = { Text("Social", fontSize = 10.sp) }
                     )
@@ -305,6 +317,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                             selectedEventId = null
                             eventSubPage = EventSubPage.Details
                         },
+                        colors = bottomNavColors,
                         icon = { Icon(Icons.Filled.EventAvailable, contentDescription = "Consultations", modifier = Modifier.size(20.dp)) },
                         label = { Text("Consult", fontSize = 10.sp) }
                     )
