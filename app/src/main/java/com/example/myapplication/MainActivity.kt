@@ -1,11 +1,13 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,8 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,7 +40,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    LoginScreen(
+                    AppContent(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -46,7 +50,32 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun AppContent(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val users = remember { loadUsersFromCsv(context) }
+    var loggedInUser by remember { mutableStateOf<User?>(null) }
+
+    if (loggedInUser == null) {
+        LoginScreen(
+            users = users,
+            onLoginSuccess = { matchedUser -> loggedInUser = matchedUser },
+            modifier = modifier
+        )
+    } else {
+        GreetingScreen(
+            user = loggedInUser!!,
+            onLogout = { loggedInUser = null },
+            modifier = modifier
+        )
+    }
+}
+
+@Composable
+fun LoginScreen(
+    users: List<User>,
+    onLoginSuccess: (User) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var showPassword by rememberSaveable { mutableStateOf(false) }
@@ -88,10 +117,21 @@ fun LoginScreen(modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
-                statusMessage = if (email.isBlank() || password.isBlank()) {
-                    "Please enter email and password."
+                val normalizedEmail = email.trim()
+                val normalizedPassword = password.trim()
+                statusMessage = if (normalizedEmail.isBlank() || normalizedPassword.isBlank()) {
+                    "Please enter both email and password."
                 } else {
-                    "Login clicked for $email"
+                    val matchedUser = users.find {
+                        it.email.equals(normalizedEmail, ignoreCase = true) &&
+                            it.password == normalizedPassword
+                    }
+                    if (matchedUser != null) {
+                        onLoginSuccess(matchedUser)
+                        "Login successful."
+                    } else {
+                        "Invalid email or password."
+                    }
                 }
             },
             modifier = Modifier
@@ -116,7 +156,40 @@ fun LoginScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(top = 16.dp)
             )
         }
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+}
+
+@Composable
+fun GreetingScreen(
+    user: User,
+    onLogout: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = "Greeting Page")
+        Text(
+            text = "Welcome, ${user.firstName} ${user.lastName}!",
+            modifier = Modifier.padding(top = 12.dp)
+        )
+        Text(
+            text = user.email,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+        Button(
+            onClick = onLogout,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Text("Logout")
+        }
     }
 }
 
@@ -124,6 +197,37 @@ fun LoginScreen(modifier: Modifier = Modifier) {
 @Composable
 fun LoginScreenPreview() {
     MyApplicationTheme {
-        LoginScreen()
+        LoginScreen(
+            users = listOf(
+                User("Demo", "User", "demo@example.com", "1234")
+            ),
+            onLoginSuccess = {}
+        )
+    }
+}
+
+data class User(
+    val firstName: String,
+    val lastName: String,
+    val email: String,
+    val password: String
+)
+
+fun loadUsersFromCsv(context: Context): List<User> {
+    return try {
+        context.assets.open("users.csv").bufferedReader().useLines { lines ->
+            lines.drop(1).mapNotNull { line ->
+                val fields = line.split(",").map { it.trim() }
+                if (fields.size < 4) return@mapNotNull null
+                User(
+                    firstName = fields[0],
+                    lastName = fields[1],
+                    email = fields[2],
+                    password = fields[3]
+                )
+            }.toList()
+        }
+    } catch (_: Exception) {
+        emptyList()
     }
 }
