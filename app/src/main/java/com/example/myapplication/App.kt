@@ -1,9 +1,11 @@
 package com.example.myapplication
 
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.EventAvailable
@@ -22,6 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,6 +61,8 @@ import com.example.myapplication.ui.MyRequestsScreen
 import com.example.myapplication.ui.ParticipantsScreen
 import com.example.myapplication.ui.SavedEventsScreen
 import com.example.myapplication.util.currentTimestamp
+import com.example.myapplication.ui.theme.GlassBlueBottom
+import com.example.myapplication.ui.theme.GlassBlueTop
 
 @Composable
 fun AppContent(modifier: Modifier = Modifier) {
@@ -76,19 +82,28 @@ fun AppContent(modifier: Modifier = Modifier) {
     var eventSubPage by remember { mutableStateOf(EventSubPage.Details) }
     val loggedInUser = users.find { it.id == loggedInUserId }
 
-    if (loggedInUser == null) {
-        LoginScreen(
-            users = users,
-            onLoginSuccess = { matchedUser ->
-                loggedInUserId = matchedUser.id
-                persistLoggedInUserId(context, matchedUser.id)
-                activeTab = LoggedInTab.Home
-                selectedEventId = null
-                eventSubPage = EventSubPage.Details
-            },
-            modifier = modifier
-        )
-    } else {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(GlassBlueTop, GlassBlueBottom)
+                )
+            )
+    ) {
+        if (loggedInUser == null) {
+            LoginScreen(
+                users = users,
+                onLoginSuccess = { matchedUser ->
+                    loggedInUserId = matchedUser.id
+                    persistLoggedInUserId(context, matchedUser.id)
+                    activeTab = LoggedInTab.Home
+                    selectedEventId = null
+                    eventSubPage = EventSubPage.Details
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
         val currentUser = loggedInUser!!
         val savedEventIds = savedEvents
             .filter { it.userId == currentUser.id }
@@ -237,9 +252,12 @@ fun AppContent(modifier: Modifier = Modifier) {
         }
 
         Scaffold(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
+            containerColor = Color.Transparent,
             bottomBar = {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = Color(0xB20C3457)
+                ) {
                     NavigationBarItem(
                         selected = activeTab == LoggedInTab.Home,
                         onClick = {
@@ -420,6 +438,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                 )
             }
         }
+    }
     }
 }
 
