@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.ui.theme.MyApplicationTheme
@@ -62,7 +64,7 @@ fun AppContent(modifier: Modifier = Modifier) {
             modifier = modifier
         )
     } else {
-        GreetingScreen(
+        HomeScreen(
             user = loggedInUser!!,
             onLogout = { loggedInUser = null },
             modifier = modifier
@@ -161,7 +163,7 @@ fun LoginScreen(
 }
 
 @Composable
-fun GreetingScreen(
+fun HomeScreen(
     user: User,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
@@ -170,23 +172,51 @@ fun GreetingScreen(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "Greeting Page")
         Text(
-            text = "Welcome, ${user.firstName} ${user.lastName}!",
-            modifier = Modifier.padding(top = 12.dp)
+            text = "Community Day 2026",
+            modifier = Modifier.padding(top = 24.dp),
+            fontWeight = FontWeight.Bold
         )
         Text(
-            text = user.email,
+            text = "Welcome, ${user.firstName}!",
+            modifier = Modifier.padding(top = 8.dp)
+        )
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Today's schedule", fontWeight = FontWeight.SemiBold)
+                Text(text = "09:00 Opening & Registration", modifier = Modifier.padding(top = 12.dp))
+                Text(text = "10:00 Expert Session: Fiscalization Trends", modifier = Modifier.padding(top = 6.dp))
+                Text(text = "11:30 Networking Break", modifier = Modifier.padding(top = 6.dp))
+                Text(text = "13:00 Lunch", modifier = Modifier.padding(top = 6.dp))
+                Text(text = "14:00 POS Technology Panel", modifier = Modifier.padding(top = 6.dp))
+                Text(text = "16:00 Consultations", modifier = Modifier.padding(top = 6.dp))
+                Text(text = "18:00 Evening Networking", modifier = Modifier.padding(top = 6.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Text(
+            text = "Event info",
+            fontWeight = FontWeight.SemiBold
+        )
+        Text(
+            text = "A full day of talks, networking, and practical consultations focused on fiscalization and POS technology.",
             modifier = Modifier.padding(top = 4.dp)
         )
         Button(
             onClick = onLogout,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
+                .padding(top = 16.dp, bottom = 24.dp)
         ) {
             Text("Logout")
         }
