@@ -16,6 +16,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,9 @@ import com.example.myapplication.model.EventRating
 import com.example.myapplication.model.FriendConnection
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
+import com.example.myapplication.notification.cancelSavedEventReminder
+import com.example.myapplication.notification.scheduleConsultationReminders
+import com.example.myapplication.notification.scheduleSavedEventReminders
 import com.example.myapplication.ui.EventDetailsScreen
 import com.example.myapplication.ui.HomeScreen
 import com.example.myapplication.ui.InfoScreen
@@ -117,6 +121,7 @@ fun AppContent(modifier: Modifier = Modifier) {
                 it.userId == currentUser.id && it.eventId == eventId
             }
             val updated = if (alreadySaved) {
+                cancelSavedEventReminder(context, currentUser.id, eventId)
                 savedEvents.filterNot {
                     it.userId == currentUser.id && it.eventId == eventId
                 }
@@ -211,6 +216,24 @@ fun AppContent(modifier: Modifier = Modifier) {
                 saveConsultationBookings(context, updatedBookings)
                 true
             }
+        }
+
+        LaunchedEffect(
+            currentUser.id,
+            events,
+            savedEvents,
+            experts,
+            consultationSlots,
+            consultationBookings
+        ) {
+            scheduleSavedEventReminders(context, currentUser.id, events, savedEvents)
+            scheduleConsultationReminders(
+                context = context,
+                userId = currentUser.id,
+                experts = experts,
+                slots = consultationSlots,
+                bookings = consultationBookings
+            )
         }
 
         Scaffold(
