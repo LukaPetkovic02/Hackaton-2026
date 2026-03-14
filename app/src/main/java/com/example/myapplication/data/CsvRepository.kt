@@ -219,3 +219,13 @@ fun loadFriends(context: Context): List<FriendConnection> {
 fun getFriendsFile(context: Context): File {
     return File(context.filesDir, "friends.csv")
 }
+
+fun saveFriends(context: Context, friends: List<FriendConnection>) {
+    val csvContent = buildString {
+        appendLine("user_a_id,user_b_id,connected_at")
+        friends.forEach { connection ->
+            appendLine("${connection.userAId},${connection.userBId},${connection.connectedAt}")
+        }
+    }
+    getFriendsFile(context).writeText(csvContent)
+}

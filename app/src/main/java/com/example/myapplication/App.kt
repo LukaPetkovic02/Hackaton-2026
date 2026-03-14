@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -26,15 +27,18 @@ import com.example.myapplication.data.loadUsersFromCsv
 import com.example.myapplication.data.loadConnectionRequests
 import com.example.myapplication.data.saveEventRatings
 import com.example.myapplication.data.saveConnectionRequests
+import com.example.myapplication.data.saveFriends
 import com.example.myapplication.data.saveSavedEvents
 import com.example.myapplication.model.ConnectionRequest
 import com.example.myapplication.model.EventRating
+import com.example.myapplication.model.FriendConnection
 import com.example.myapplication.model.SavedEvent
 import com.example.myapplication.model.User
 import com.example.myapplication.ui.EventDetailsScreen
 import com.example.myapplication.ui.HomeScreen
 import com.example.myapplication.ui.InfoScreen
 import com.example.myapplication.ui.LoginScreen
+import com.example.myapplication.ui.MyRequestsScreen
 import com.example.myapplication.ui.ParticipantsScreen
 import com.example.myapplication.ui.SavedEventsScreen
 import com.example.myapplication.util.currentTimestamp
@@ -47,7 +51,7 @@ fun AppContent(modifier: Modifier = Modifier) {
     var savedEvents by remember { mutableStateOf(loadSavedEvents(context)) }
     var eventRatings by remember { mutableStateOf(loadEventRatings(context)) }
     var connectionRequests by remember { mutableStateOf(loadConnectionRequests(context)) }
-    val friends = remember { loadFriends(context) }
+    var friends by remember { mutableStateOf(loadFriends(context)) }
     var loggedInUser by remember { mutableStateOf<User?>(null) }
     var activeTab by remember { mutableStateOf(LoggedInTab.Home) }
     var selectedEventId by remember { mutableStateOf<Int?>(null) }
@@ -86,6 +90,11 @@ fun AppContent(modifier: Modifier = Modifier) {
             .filter { it.fromUserId == currentUser.id }
             .map { it.toUserId }
             .toSet()
+        val sentRequests = connectionRequests.filter { it.fromUserId == currentUser.id }
+        val receivedRequests = connectionRequests.filter { it.toUserId == currentUser.id }
+        val connections = users
+            .filter { friendUserIds.contains(it.id) }
+            .sortedWith(compareBy({ it.lastName }, { it.firstName }))
 
         val onToggleSave: (Int) -> Unit = { eventId ->
             val alreadySaved = savedEvents.any {
@@ -138,6 +147,40 @@ fun AppContent(modifier: Modifier = Modifier) {
             }
         }
 
+        val onAcceptRequest: (ConnectionRequest) -> Unit = { request ->
+            if (request.toUserId == currentUser.id) {
+                val updatedRequests = connectionRequests.filterNot {
+                    it.fromUserId == request.fromUserId && it.toUserId == request.toUserId
+                }
+                connectionRequests = updatedRequests
+                saveConnectionRequests(context, updatedRequests)
+
+                val alreadyFriends = friends.any {
+                    (it.userAId == request.fromUserId && it.userBId == request.toUserId) ||
+                        (it.userAId == request.toUserId && it.userBId == request.fromUserId)
+                }
+                if (!alreadyFriends) {
+                    val updatedFriends = friends + FriendConnection(
+                        userAId = minOf(request.fromUserId, request.toUserId),
+                        userBId = maxOf(request.fromUserId, request.toUserId),
+                        connectedAt = currentTimestamp()
+                    )
+                    friends = updatedFriends
+                    saveFriends(context, updatedFriends)
+                }
+            }
+        }
+
+        val onDeclineRequest: (ConnectionRequest) -> Unit = { request ->
+            if (request.toUserId == currentUser.id) {
+                val updatedRequests = connectionRequests.filterNot {
+                    it.fromUserId == request.fromUserId && it.toUserId == request.toUserId
+                }
+                connectionRequests = updatedRequests
+                saveConnectionRequests(context, updatedRequests)
+            }
+        }
+
         Scaffold(
             modifier = modifier.fillMaxSize(),
             bottomBar = {
@@ -171,6 +214,16 @@ fun AppContent(modifier: Modifier = Modifier) {
                         },
                         icon = { Icon(Icons.Filled.Info, contentDescription = "Info") },
                         label = { Text("Info") }
+                    )
+                    NavigationBarItem(
+                        selected = activeTab == LoggedInTab.MyRequests,
+                        onClick = {
+                            activeTab = LoggedInTab.MyRequests
+                            selectedEventId = null
+                            eventSubPage = EventSubPage.Details
+                        },
+                        icon = { Icon(Icons.Filled.Person, contentDescription = "My Requests") },
+                        label = { Text("Social") }
                     )
                 }
             }
@@ -278,6 +331,16 @@ fun AppContent(modifier: Modifier = Modifier) {
                     onLogout = { loggedInUser = null },
                     modifier = Modifier.padding(innerPadding)
                 )
+
+                LoggedInTab.MyRequests -> MyRequestsScreen(
+                    sentRequests = sentRequests,
+                    receivedRequests = receivedRequests,
+                    connections = connections,
+                    userNamesById = userNamesById,
+                    onAccept = onAcceptRequest,
+                    onDecline = onDeclineRequest,
+                    modifier = Modifier.padding(innerPadding)
+                )
             }
         }
     }
@@ -286,7 +349,8 @@ fun AppContent(modifier: Modifier = Modifier) {
 private enum class LoggedInTab {
     Home,
     MyAgenda,
-    Info
+    Info,
+    MyRequests
 }
 
 private enum class EventSubPage {
