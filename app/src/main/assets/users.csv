@@ -1,4 +1,4 @@
 user_id,first_name,last_name,email,password
 1,John,Doe,john.doe@example.com,a
 2,Jane,Smith,jane.smith@example.com,b
-3,Mark,Johnson,mark.johnson@example.com,letmein789
+3,Mark,Johnson,mark.johnson@example.com,c
