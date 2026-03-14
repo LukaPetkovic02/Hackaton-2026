@@ -1,0 +1,7 @@
+event_id,title,start_time,end_time,location,speaker,description,category
+101,Opening & Registration,09:00,09:30,Main Hall,Fiscal Solutions Team,Welcome and event opening,General
+102,Fiscalization Trends 2026,09:30,10:15,Conference Room A,Ana Petrovic,Overview of the latest fiscalization trends,Talk
+103,POS Innovation Panel,10:30,11:15,Conference Room B,Various Speakers,Discussion about POS technology,Panel
+104,Networking Break,11:15,11:45,Lounge Area,,Meet other participants and exchange ideas,Networking
+105,Expert Consultations,12:00,13:00,Meeting Zone,Industry Experts,One-on-one consultations with experts,Consultation
+106,Evening Networking,18:00,20:00,Rooftop Lounge,,Informal networking event,Social
